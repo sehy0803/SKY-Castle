@@ -82,7 +82,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		JLabel logoLabel = new JLabel(logo);
 		logoPanel.setOpaque(false);
 		logoPanel.add(logoLabel);
-		logoPanel.setBounds(140, 0, 300, 300);
+		logoPanel.setBounds(0, 0, 600, 300);
 		panel.add(logoPanel);
 	}
 
@@ -116,7 +116,13 @@ public class MainFrame extends JFrame implements ActionListener {
 
 		} else if (obj == btnMovement) {
 			// 좌석이동
+			
 
+
+		} else if (obj == btnStatus) {
+			// 좌석현황
+			new SeatStatusFrame();
+			setVisible(false);
 
 
 		} else if (obj == btnLeave) {

@@ -29,11 +29,11 @@ public class BasicFrame extends JFrame {
 	// 로고 이미지 설정
 	private void setLogo() {
 		JPanel logoPanel = new JPanel();
-		ImageIcon logo = new ImageIcon("images/logoL.png");
+		ImageIcon logo = new ImageIcon("images/logoS.png");
 		JLabel logoLabel = new JLabel(logo);
 		logoPanel.setOpaque(false);
 		logoPanel.add(logoLabel);
-		logoPanel.setBounds(0, 0, 600, 600);
+		logoPanel.setBounds(0, 0, 300, 300);
 		panel.add(logoPanel);
 	}
 
