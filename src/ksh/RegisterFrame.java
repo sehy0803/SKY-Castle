@@ -213,7 +213,7 @@ public class RegisterFrame extends JFrame implements ActionListener {
             String tel = tfTel.getText();
 
             insertUser(id, pw, name, tel);
-		} else {
+		} else if (obj == btnBack){
 			new LoginFrame();
 			setVisible(false);
 		}

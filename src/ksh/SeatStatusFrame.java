@@ -8,9 +8,11 @@ import ksh.RoundedButton;
 
 public class SeatStatusFrame extends JFrame implements ActionListener {
 	private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
+	private Font fontB = new Font("", Font.PLAIN, 15);
     private JPanel panel;
     private JButton[][] seats;
     private boolean[][] reserved;  // 좌석 예약 상태를 저장할 배열
+	private RoundedButton btnBack;
 
     public SeatStatusFrame() {
         setTitle("스카이캐슬");
@@ -21,13 +23,22 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
 
         backgroundImage();
         setLogo();
-
+        setButton();
         seatLayout();
 
         setVisible(true);
     }
 
-    // 로고 이미지 설정
+    private void setButton() {
+    	btnBack = new RoundedButton("◀");
+		btnBack.setFont(fontB);
+		btnBack.addActionListener(this);
+		btnBack.setBounds(10, 10, 35, 35);
+		panel.add(btnBack);
+		
+	}
+
+	// 로고 이미지 설정
     private void setLogo() {
         JPanel logoPanel = new JPanel();
         ImageIcon logo = new ImageIcon("images/logoS.png");
@@ -91,6 +102,12 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+    	Object obj = e.getSource();
+    	if(obj==btnBack) {
+    		new MainFrame();
+    		setVisible(false);
+    	}
+    	
         JButton seatButton = (JButton) e.getSource();
         int row = -1;
         int col = -1;
