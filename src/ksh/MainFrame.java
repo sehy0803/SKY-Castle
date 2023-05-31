@@ -10,6 +10,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import cyc.UserInfoFrame;
+
 public class MainFrame extends JFrame implements ActionListener {
 	private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
     private JPanel panel;
@@ -138,7 +140,8 @@ public class MainFrame extends JFrame implements ActionListener {
 
 		}else if (obj == btnUserInfo) {
 			// 회원정보
-			// System.exit(0);
+			new UserInfoFrame();
+			setVisible(false);
 		}
 
 	}

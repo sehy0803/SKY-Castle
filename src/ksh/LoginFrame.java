@@ -132,7 +132,7 @@ public class LoginFrame extends JFrame implements ActionListener {
 
             if (rs.next()) {
                 JOptionPane.showMessageDialog(null, "로그인 성공");
-                MainFrame mf = new MainFrame();
+                MainFrame mainFrame = new MainFrame();
 				dispose();
             } else {
                 JOptionPane.showMessageDialog(null, "아이디 또는 비밀번호가 올바르지 않습니다.");
