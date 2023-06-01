@@ -79,7 +79,7 @@ public class BasicFrame extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
     	if(obj==btnBack) {
-    		new MainFrame();
+    		new MainFrame("");
     		setVisible(false);
     	}	
 		
