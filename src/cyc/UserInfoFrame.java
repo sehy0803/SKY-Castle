@@ -27,22 +27,35 @@ import ksh.User;
 public class UserInfoFrame extends JFrame implements ActionListener {
 
 	private Font fontA = new Font("맑은 고딕", Font.BOLD, 18);
-	private Font fontB = new Font("", Font.PLAIN, 15);
+	private Font fontB = new Font("맑은 고딕", Font.PLAIN, 15);
+	private Font fontD = new Font("맑은 고딕", Font.BOLD, 30);
 	private JPanel panel;
+	
 	private RoundedButton btnUnRegister;
 	private RoundedButton btnBack;
-	private JLabel lblName;
+	
 	private JLabel lblId;
 	private JLabel lblPw;
+	private JLabel lblName;
+	private JLabel lblPhone;
 	private JLabel lblSeat;
 	private JLabel lblTime;
-	private JLabel lblUname;
-	private JLabel tfID;
-	private JLabel tfPW;
-	private JLabel lblReservedSeat;
+	
+	private JLabel infoId;
+	private JLabel infoPw;
+	private JLabel infoName;
+	private JLabel infoPhone;
+	private JLabel infoSeat;
+	private JLabel infoTime;
+	
 	private JPanel whitePanel;
-	private JLabel lblPhone;
+	
 	private User user;
+	
+	// JDBC 연결 정보
+    private static final String URL = "jdbc:mysql://localhost/studycafe";
+    private static final String USER = "root";
+    private static final String PASSWORD = "1234";
 	
 	private static String loggedInUserId; // 로그인한 사용자의 아이디
 	
@@ -57,12 +70,12 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 		backgroundImage();
 		setLogo();
 		setWhitePanel();
-		setInfoTitle();
+		setInfoLabel();
 		setButton();
 
-		user = getUserInfo(); // 회원 정보 가져오기
+		user = getUserInfo(); // 회원정보 가져오기
 
-        setUserInfo(); // 회원 정보 설정
+        setUserInfo();
         
 		setVisible(true);
 	}
@@ -77,7 +90,13 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 	}
 
 	// 라벨 설정
-	private void setInfoTitle() {
+	private void setInfoLabel() {
+		JLabel lblUserInfo = new JLabel("회원정보");
+		lblUserInfo.setFont(fontD);
+		lblUserInfo.setBounds(60, 12, 150, 30);
+		lblUserInfo.setForeground(new Color(125, 83, 154));
+    	panel.add(lblUserInfo);
+    	
 		lblName = new JLabel("이름");
 		lblId = new JLabel("아이디");
 		lblPw = new JLabel("비밀번호");
@@ -105,6 +124,34 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 		whitePanel.add(lblPhone);
 		whitePanel.add(lblSeat);
 		whitePanel.add(lblTime);
+		
+		infoName = new JLabel();
+		infoId = new JLabel();
+		infoPw = new JLabel();
+		infoPhone = new JLabel();
+		infoSeat = new JLabel();
+		infoTime = new JLabel();
+
+		infoName.setFont(fontB);
+		infoId.setFont(fontB);
+		infoPw.setFont(fontB);
+		infoPhone.setFont(fontB);
+		infoSeat.setFont(fontB);
+		infoTime.setFont(fontB);
+
+		infoName.setBounds(150, 30, 200, 30);
+		infoId.setBounds(150, 90, 200, 30);
+		infoPw.setBounds(150, 150, 200, 30);
+		infoPhone.setBounds(150, 210, 200, 30);
+		infoSeat.setBounds(150, 270, 200, 30);
+		infoTime.setBounds(150, 330, 200, 30);
+
+		whitePanel.add(infoName);
+		whitePanel.add(infoId);
+		whitePanel.add(infoPw);
+		whitePanel.add(infoPhone);
+		whitePanel.add(infoSeat);
+		whitePanel.add(infoTime);
 	}
 
 	// 로고 이미지 설정
@@ -179,7 +226,7 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 
         try {
             // 데이터베이스 연결 설정
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/studycafe", "root", "1234");
+            Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
 
             // 쿼리 실행
             String query = "SELECT uName, uId, uPw, uPhone, uSeat, reservation_time FROM users WHERE uId = '" + userId + "'";
@@ -195,7 +242,6 @@ public class UserInfoFrame extends JFrame implements ActionListener {
                 reservedTime = resultSet.getString("reservation_time");
             }
 
-            // 연결 및 리소스 해제
             resultSet.close();
             statement.close();
             connection.close();
@@ -207,65 +253,59 @@ public class UserInfoFrame extends JFrame implements ActionListener {
     }
 	
 	// 회원 정보 설정
-    public void setUserInfo() {
-        lblUname = new JLabel(user.getName());
-        lblUname.setFont(fontA);
-        lblUname.setBounds(150, 30, 200, 30);
-        whitePanel.add(lblUname);
-
-        tfID = new JLabel(user.getId());
-        tfID.setFont(fontA);
-        tfID.setBounds(150, 90, 200, 30);
-        whitePanel.add(tfID);
-
-        tfPW = new JLabel(user.getPassword());
-        tfPW.setFont(fontA);
-        tfPW.setBounds(150, 150, 200, 30);
-        whitePanel.add(tfPW);
-
-        lblPhone = new JLabel(user.getPhone());
-        lblPhone.setFont(fontA);
-        lblPhone.setBounds(150, 210, 200, 30);
-        whitePanel.add(lblPhone);
-
-        lblReservedSeat = new JLabel(Integer.toString(user.getSeatNumber()));
-        lblReservedSeat.setFont(fontA);
-        lblReservedSeat.setBounds(150, 270, 200, 30);
-        whitePanel.add(lblReservedSeat);
-
-        lblTime = new JLabel(user.getReservationTime());
-        lblTime.setFont(fontA);
-        lblTime.setBounds(150, 330, 200, 30);
-        whitePanel.add(lblTime);
-    }
+	public void setUserInfo() {
+		infoName.setText(user.getName());
+		infoId.setText(user.getId());
+		infoPw.setText(user.getPw());
+		infoPhone.setText(user.getPhone());
+		infoSeat.setText(String.valueOf(user.getSeat())); // 좌석번호를 문자열로 변환
+		infoTime.setText(user.getTime());
+	}
    
-    // 회원탈퇴 기능
+	// 회원 탈퇴 기능
     private void doUnRegister() {
-        try {
-            // 데이터베이스 연결 설정
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/studycafe", "root", "1234");
+            String userId = infoId.getText(); // 회원 아이디 가져오기
 
-            // 쿼리 실행
-            String query = "DELETE FROM users WHERE uId = ?";
-            PreparedStatement pstmt = connection.prepareStatement(query);
-            pstmt.setString(1, loggedInUserId);
-            int rowsAffected = pstmt.executeUpdate();
+            try {
+                // JDBC 드라이버 로드
+                Class.forName("com.mysql.cj.jdbc.Driver");
 
-            // 연결 및 리소스 해제
-            pstmt.close();
-            connection.close();
+                // 데이터베이스 연결
+                Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
 
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "회원탈퇴가 완료되었습니다.", "회원탈퇴", JOptionPane.INFORMATION_MESSAGE);
-                setVisible(false);
-                new LoginFrame();
-            } else {
-                JOptionPane.showMessageDialog(this, "회원탈퇴에 실패했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                // 외래 키 제약 조건 해제
+                String disableForeignKeyCheck = "SET FOREIGN_KEY_CHECKS=0";
+                PreparedStatement disableFkStmt = conn.prepareStatement(disableForeignKeyCheck);
+                disableFkStmt.executeUpdate();
+
+                // 회원 삭제
+                String deleteUserQuery = "DELETE FROM users WHERE uId = ?";
+                PreparedStatement deleteUserStmt = conn.prepareStatement(deleteUserQuery);
+                deleteUserStmt.setString(1, userId);
+                int rowsAffected = deleteUserStmt.executeUpdate();
+
+                // 외래 키 제약 조건 복원
+                String enableForeignKeyCheck = "SET FOREIGN_KEY_CHECKS=1";
+                PreparedStatement enableFkStmt = conn.prepareStatement(enableForeignKeyCheck);
+                enableFkStmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(this, "회원탈퇴가 완료되었습니다.");
+                    dispose();
+                    new LoginFrame();
+                } else {
+                    JOptionPane.showMessageDialog(this, "회원탈퇴에 실패했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                }
+
+                disableFkStmt.close();
+                deleteUserStmt.close();
+                enableFkStmt.close();
+                conn.close();
+            } catch (ClassNotFoundException | SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "데이터베이스 오류", "오류", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "데이터베이스 오류", "오류", JOptionPane.ERROR_MESSAGE);
-        }
     }
+
 
 }

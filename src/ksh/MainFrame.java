@@ -5,10 +5,16 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import cyc.UserInfoFrame;
@@ -24,6 +30,11 @@ public class MainFrame extends JFrame implements ActionListener {
     private RoundedButton btnStatus;
 
     private String loggedInUserId; // 로그인한 사용자의 아이디
+    
+    // JDBC 연결 정보
+    private static final String URL = "jdbc:mysql://localhost/studycafe";
+    private static final String USER = "root";
+    private static final String PASSWORD = "1234";
 
     public MainFrame(String userId) {
         this.loggedInUserId = userId;
@@ -121,8 +132,17 @@ public class MainFrame extends JFrame implements ActionListener {
             setVisible(false);
         } else if (obj == btnLeave) {
             // 퇴실
-            new LoginFrame();
-            setVisible(false);
+            boolean hasReservation = checkReservation(loggedInUserId); // 회원의 예약 여부 확인
+            if (hasReservation) {
+                int confirmation = JOptionPane.showConfirmDialog(this, "예약된 좌석이 있습니다. 예약을 취소하고 퇴실하시겠습니까?", "퇴실", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_OPTION) {
+                    cancelReservation(loggedInUserId); // 사용자의 좌석 예약 취소
+                    new LoginFrame();
+                    setVisible(false);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "예약한 좌석이 없습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+            }
         } else if (obj == btnMySeat) {
             // 내 좌석
         } else if (obj == btnUserInfo) {
@@ -131,5 +151,44 @@ public class MainFrame extends JFrame implements ActionListener {
             setVisible(false);
         }
     }
+    
+    // 회원의 예약 여부 확인
+    private boolean checkReservation(String userId) {
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            String sql = "SELECT COUNT(*) AS count FROM reservations WHERE uId = ?";
+            PreparedStatement statement = conn.prepareStatement(sql);
+            statement.setString(1, userId);
+
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                int count = result.getInt("count");
+                return count > 0;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+    
+    
+    // 예약 취소
+    private void cancelReservation(String userId) {
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            String deleteReservationSql = "DELETE FROM reservations WHERE uId = ?";
+            PreparedStatement deleteReservationStatement = conn.prepareStatement(deleteReservationSql);
+            deleteReservationStatement.setString(1, userId);
+            deleteReservationStatement.executeUpdate();
+
+            String updateUsersSql = "UPDATE users SET uSeat = NULL WHERE uId = ?";
+            PreparedStatement updateUsersStatement = conn.prepareStatement(updateUsersSql);
+            updateUsersStatement.setString(1, userId);
+            updateUsersStatement.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
+
     
 }

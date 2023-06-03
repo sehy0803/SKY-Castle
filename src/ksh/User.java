@@ -5,16 +5,16 @@ public class User {
     private String id;
     private String password;
     private String phone;
-    private int seatNumber;
-    private String reservationTime;
+    private int seat;
+    private String time;
 
-    public User(String name, String id, String password, String phone, int seatNumber, String reservationTime) {
+    public User(String name, String id, String password, String phone, int seat, String time) {
         this.name = name;
         this.id = id;
         this.password = password;
         this.phone = phone;
-        this.seatNumber = seatNumber;
-        this.reservationTime = reservationTime;
+        this.seat = seat;
+        this.time = time;
     }
 
     // Getter 메소드
@@ -27,7 +27,7 @@ public class User {
         return id;
     }
 
-    public String getPassword() {
+    public String getPw() {
         return password;
     }
 
@@ -35,11 +35,11 @@ public class User {
         return phone;
     }
 
-    public int getSeatNumber() {
-        return seatNumber;
+    public int getSeat() {
+        return seat;
     }
 
-    public String getReservationTime() {
-        return reservationTime;
+    public String getTime() {
+        return time;
     }
 }

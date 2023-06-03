@@ -134,8 +134,9 @@ public class LoginFrame extends JFrame implements ActionListener {
 
     // 로그인 기능
     private void doLogin() {
-        String id = tfId.getText();
-        String password = tfPw.getText();
+    	String id = tfId.getText();
+        char[] passwordChars = tfPw.getPassword();
+        String password = new String(passwordChars);
 
         if (id.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "아이디와 비밀번호를 모두 입력해주세요.", "오류", JOptionPane.ERROR_MESSAGE);

@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 
 public class RegisterFrame extends JFrame implements ActionListener {
     private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
-    private Font fontB = new Font("", Font.PLAIN, 15);
+    private Font fontB = new Font("맑은 고딕", Font.PLAIN, 15);
     private JPanel panel;
     private JPanel whitePanel;
     private RoundedButton btnRegister;
