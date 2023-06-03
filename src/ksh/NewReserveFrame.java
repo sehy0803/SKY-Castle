@@ -13,7 +13,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 
 import ksh.RoundedButton;
 
@@ -267,28 +269,45 @@ public class NewReserveFrame extends JFrame implements ActionListener {
         }
     }
 
-
     // 좌석 상태 저장
     private void reserveSeatInDatabase(int row, int col, int reservationTime) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            String insertReservationSql = "INSERT INTO reservations (uId, reservationDate, reservationTime, seatNumber) VALUES (?, ?, ?, ?)";
-            PreparedStatement insertReservationStatement = conn.prepareStatement(insertReservationSql);
-            insertReservationStatement.setString(1, loggedInUserId);
-            insertReservationStatement.setTimestamp(2, new Timestamp(System.currentTimeMillis())); // 현재 시간
-            insertReservationStatement.setInt(3, reservationTime);
-            insertReservationStatement.setInt(4, row * 5 + col + 1);
-            insertReservationStatement.executeUpdate();
+        	String insertReservationSql = "INSERT INTO reservations (uId, reservationStartTime, reservationEndTime, reservationTime, seatNumber) VALUES (?, ?, ?, ?, ?)";
+        	PreparedStatement insertReservationStatement = conn.prepareStatement(insertReservationSql);
+        	insertReservationStatement.setString(1, loggedInUserId);
 
-            String updateUsersSql = "UPDATE users SET uSeat = ? WHERE uId = ?";
+        	// 시작 시간 계산
+        	Timestamp reservationStartTime = new Timestamp(System.currentTimeMillis());
+        	insertReservationStatement.setTimestamp(2, reservationStartTime);
+
+        	// 종료 시간 계산
+        	Calendar cal = Calendar.getInstance();
+        	cal.setTimeInMillis(reservationStartTime.getTime());
+        	cal.add(Calendar.HOUR, reservationTime);
+        	Timestamp reservationEndTime = new Timestamp(cal.getTime().getTime());
+        	insertReservationStatement.setTimestamp(3, reservationEndTime);
+
+        	insertReservationStatement.setInt(4, reservationTime);
+        	insertReservationStatement.setInt(5, row * 5 + col + 1);
+        	insertReservationStatement.executeUpdate();
+
+            String updateUsersSql = "UPDATE users SET uSeat = ?, reservationTime = ? WHERE uId = ?";
             PreparedStatement updateUsersStatement = conn.prepareStatement(updateUsersSql);
             updateUsersStatement.setInt(1, row * 5 + col + 1);
-            updateUsersStatement.setString(2, loggedInUserId);
+            updateUsersStatement.setInt(2, reservationTime);
+            updateUsersStatement.setString(3, loggedInUserId);
             updateUsersStatement.executeUpdate();
+            
+            // 예약 정보 출력
+            System.out.println("선택한 예약시간: " + reservationTime);
+            
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            System.out.println("예약 시작 시간: " + dateFormat.format(reservationStartTime));
+            System.out.println("예약 종료 시간: " + dateFormat.format(reservationEndTime));
+            
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
-
-
 
 }

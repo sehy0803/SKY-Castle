@@ -72,7 +72,7 @@ public class MainFrame extends JFrame implements ActionListener {
         btnLeave.addActionListener(this);
         btnLeave.setBounds(300, 415, 200, 100);
 
-        btnMySeat = new RoundedButton("내 자리");
+        btnMySeat = new RoundedButton("내 좌석");
         btnMySeat.setFont(fontA);
         btnMySeat.addActionListener(this);
         btnMySeat.setBounds(85, 530, 200, 100);
@@ -145,6 +145,8 @@ public class MainFrame extends JFrame implements ActionListener {
             }
         } else if (obj == btnMySeat) {
             // 내 좌석
+        	new MySeatFrame(loggedInUserId);
+        	setVisible(false);
         } else if (obj == btnUserInfo) {
             // 회원정보
             new UserInfoFrame(loggedInUserId);
@@ -179,7 +181,7 @@ public class MainFrame extends JFrame implements ActionListener {
             deleteReservationStatement.setString(1, userId);
             deleteReservationStatement.executeUpdate();
 
-            String updateUsersSql = "UPDATE users SET uSeat = NULL WHERE uId = ?";
+            String updateUsersSql = "UPDATE users SET uSeat = NULL, reservationTime = NULL WHERE uId = ?";
             PreparedStatement updateUsersStatement = conn.prepareStatement(updateUsersSql);
             updateUsersStatement.setString(1, userId);
             updateUsersStatement.executeUpdate();
@@ -187,6 +189,7 @@ public class MainFrame extends JFrame implements ActionListener {
             ex.printStackTrace();
         }
     }
+
 
 
 

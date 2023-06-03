@@ -29,6 +29,7 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 	private Font fontA = new Font("맑은 고딕", Font.BOLD, 18);
 	private Font fontB = new Font("맑은 고딕", Font.PLAIN, 15);
 	private Font fontD = new Font("맑은 고딕", Font.BOLD, 30);
+	private Font fontH = new Font("맑은 고딕", Font.PLAIN, 18);
 	private JPanel panel;
 	
 	private RoundedButton btnUnRegister;
@@ -38,15 +39,13 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 	private JLabel lblPw;
 	private JLabel lblName;
 	private JLabel lblPhone;
-	private JLabel lblSeat;
-	private JLabel lblTime;
+
 	
 	private JLabel infoId;
 	private JLabel infoPw;
 	private JLabel infoName;
 	private JLabel infoPhone;
-	private JLabel infoSeat;
-	private JLabel infoTime;
+
 	
 	private JPanel whitePanel;
 	
@@ -84,7 +83,7 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 	private void setWhitePanel() {
 		whitePanel = new JPanel();
 		whitePanel.setBackground(Color.WHITE);
-		whitePanel.setBounds(105, 250, 380, 390);
+		whitePanel.setBounds(105, 250, 380, 270);
 		whitePanel.setLayout(null);
 		panel.add(whitePanel);
 	}
@@ -101,57 +100,52 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 		lblId = new JLabel("아이디");
 		lblPw = new JLabel("비밀번호");
 		lblPhone = new JLabel("전화번호");
-		lblSeat = new JLabel("좌석번호");
-		lblTime = new JLabel("예약시간");
+
 
 		lblName.setFont(fontA);
 		lblId.setFont(fontA);
 		lblPw.setFont(fontA);
 		lblPhone.setFont(fontA);
-		lblSeat.setFont(fontA);
-		lblTime.setFont(fontA);
+
 
 		lblName.setBounds(30, 30, 100, 30);
 		lblId.setBounds(30, 90, 100, 30);
 		lblPw.setBounds(30, 150, 100, 30);
 		lblPhone.setBounds(30, 210, 100, 30);
-		lblSeat.setBounds(30, 270, 100, 30);
-		lblTime.setBounds(30, 330, 100, 30);
+
 
 		whitePanel.add(lblName);
 		whitePanel.add(lblId);
 		whitePanel.add(lblPw);
 		whitePanel.add(lblPhone);
-		whitePanel.add(lblSeat);
-		whitePanel.add(lblTime);
+
 		
 		infoName = new JLabel();
 		infoId = new JLabel();
 		infoPw = new JLabel();
 		infoPhone = new JLabel();
-		infoSeat = new JLabel();
-		infoTime = new JLabel();
 
-		infoName.setFont(fontB);
-		infoId.setFont(fontB);
-		infoPw.setFont(fontB);
-		infoPhone.setFont(fontB);
-		infoSeat.setFont(fontB);
-		infoTime.setFont(fontB);
+
+		infoName.setFont(fontH);
+		infoId.setFont(fontH);
+		infoPw.setFont(fontH);
+		infoPhone.setFont(fontH);
+
+		infoName.setForeground(new Color(197, 132, 243));
+		infoId.setForeground(new Color(197, 132, 243));
+		infoPw.setForeground(new Color(197, 132, 243));
+		infoPhone.setForeground(new Color(197, 132, 243));
 
 		infoName.setBounds(150, 30, 200, 30);
 		infoId.setBounds(150, 90, 200, 30);
 		infoPw.setBounds(150, 150, 200, 30);
 		infoPhone.setBounds(150, 210, 200, 30);
-		infoSeat.setBounds(150, 270, 200, 30);
-		infoTime.setBounds(150, 330, 200, 30);
+
 
 		whitePanel.add(infoName);
 		whitePanel.add(infoId);
 		whitePanel.add(infoPw);
 		whitePanel.add(infoPhone);
-		whitePanel.add(infoSeat);
-		whitePanel.add(infoTime);
 	}
 
 	// 로고 이미지 설정
@@ -186,7 +180,7 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 		btnUnRegister = new RoundedButton("회원탈퇴");
 		btnUnRegister.setFont(fontA);
 		btnUnRegister.addActionListener(this);
-		btnUnRegister.setBounds(420, 660, 120, 60);
+		btnUnRegister.setBounds(295, 550, 190, 60);
 
 		btnBack = new RoundedButton("◀");
 		btnBack.setFont(fontB);
@@ -222,24 +216,20 @@ public class UserInfoFrame extends JFrame implements ActionListener {
         String password = ""; // 비밀번호
         String phone = ""; // 전화번호
         int seatNumber = 0; // 좌석번호
-        String reservedTime = ""; // 예약시간
-
+		String reservedTime = null; // 예약시간
+		
         try {
-            // 데이터베이스 연결 설정
+            // 데이터베이스 연결
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
 
-            // 쿼리 실행
-            String query = "SELECT uName, uId, uPw, uPhone, uSeat, reservation_time FROM users WHERE uId = '" + userId + "'";
+            String query = "SELECT uName, uId, uPw, uPhone FROM users WHERE uId = '" + userId + "'";
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
 
-            // 결과 처리
             if (resultSet.next()) {
                 name = resultSet.getString("uName");
                 password = resultSet.getString("uPw");
                 phone = resultSet.getString("uPhone");
-                seatNumber = resultSet.getInt("uSeat");
-                reservedTime = resultSet.getString("reservation_time");
             }
 
             resultSet.close();
@@ -248,8 +238,8 @@ public class UserInfoFrame extends JFrame implements ActionListener {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return new User(name, userId, password, phone, seatNumber, reservedTime);
+		
+		return new User(name, userId, password, phone, seatNumber, reservedTime);
     }
 	
 	// 회원 정보 설정
@@ -258,8 +248,6 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 		infoId.setText(user.getId());
 		infoPw.setText(user.getPw());
 		infoPhone.setText(user.getPhone());
-		infoSeat.setText(String.valueOf(user.getSeat())); // 좌석번호를 문자열로 변환
-		infoTime.setText(user.getTime());
 	}
    
 	// 회원 탈퇴 기능
