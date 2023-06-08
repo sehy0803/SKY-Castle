@@ -164,7 +164,9 @@ public class MainFrame extends JFrame implements ActionListener {
             setVisible(false);
         }
     }
-
+    
+    
+    // 좌석이동
 	private void doMovement() {
 		int reservedSeatNumber = getReservedSeatNumber(loggedInUserId);
 
@@ -218,22 +220,19 @@ public class MainFrame extends JFrame implements ActionListener {
     // 예약 취소
     private void cancelReservation(String userId) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+        	String updateSeatsSql = "UPDATE seats SET seatStatus = '예약 가능' WHERE seatNumber IN (SELECT seatNumber FROM reservations WHERE uId = ?)";
+        	PreparedStatement updateSeatsStatement = conn.prepareStatement(updateSeatsSql);
+        	updateSeatsStatement.setString(1, userId);
+        	updateSeatsStatement.executeUpdate();
+        	
             String deleteReservationSql = "DELETE FROM reservations WHERE uId = ?";
             PreparedStatement deleteReservationStatement = conn.prepareStatement(deleteReservationSql);
             deleteReservationStatement.setString(1, userId);
             deleteReservationStatement.executeUpdate();
             
-            String deleteSeatsSql = "DELETE FROM seats WHERE uId = ?";
-            PreparedStatement deleteSeatsStatement = conn.prepareStatement(deleteSeatsSql);
-            deleteSeatsStatement.setString(1, userId);
-            deleteSeatsStatement.executeUpdate();
-            
-            String updateUsersSql = "UPDATE users SET uSeat = NULL, reservationTime = NULL WHERE uId = ?";
-            PreparedStatement updateUsersStatement = conn.prepareStatement(updateUsersSql);
-            updateUsersStatement.setString(1, userId);
-            updateUsersStatement.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
+
 }

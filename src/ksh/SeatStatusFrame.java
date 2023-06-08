@@ -126,7 +126,7 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
     	}
     }
     
- // 좌석 상태 가져오기
+    // 좌석 상태 가져오기
     private void loadSeatStatus() {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
             String loadSeatsSql = "SELECT seatNumber, seatStatus FROM seats";

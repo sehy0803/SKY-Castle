@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -24,7 +26,7 @@ import ksh.MainFrame;
 import ksh.RoundedButton;
 import ksh.User;
 
-public class UserInfoFrame extends JFrame implements ActionListener {
+public class UserInfoFrame extends JFrame implements ActionListener, MouseListener {
 
 	private Font fontA = new Font("맑은 고딕", Font.BOLD, 18);
 	private Font fontB = new Font("맑은 고딕", Font.PLAIN, 15);
@@ -50,6 +52,7 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 	private JPanel whitePanel;
 	
 	private User user;
+	private JLabel lblLogout;
 	
 	// JDBC 연결 정보
     private static final String URL = "jdbc:mysql://localhost/studycafe";
@@ -87,9 +90,17 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 		whitePanel.setLayout(null);
 		panel.add(whitePanel);
 	}
-
+	
 	// 라벨 설정
 	private void setInfoLabel() {
+		lblLogout = new JLabel("로그아웃");
+		lblLogout.setBounds(260, 680, 70, 30);
+		lblLogout.setFont(fontB);
+		lblLogout.setForeground(Color.gray);
+		lblLogout.addMouseListener(this);
+		panel.add(lblLogout);
+		
+		
 		JLabel lblUserInfo = new JLabel("회원정보");
 		lblUserInfo.setFont(fontD);
 		lblUserInfo.setBounds(60, 12, 150, 30);
@@ -181,7 +192,7 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 		btnUnRegister.setFont(fontA);
 		btnUnRegister.addActionListener(this);
 		btnUnRegister.setBounds(295, 550, 190, 60);
-
+		
 		btnBack = new RoundedButton("◀");
 		btnBack.setFont(fontB);
 		btnBack.addActionListener(this);
@@ -203,10 +214,6 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 			new MainFrame(loggedInUserId);
 			setVisible(false);
 		}
-	}
-	
-	public static void main(String[] args) {
-		new UserInfoFrame(loggedInUserId);
 	}
 	
 	// 회원정보 가져오기
@@ -248,6 +255,7 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 		infoPhone.setText(user.getPhone());
 	}
    
+	// 회원탈퇴 기능
 	private void doUnRegister() {
 	    String userId = infoId.getText(); // 회원 아이디 가져오기
 
@@ -257,7 +265,7 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 
 	        // 데이터베이스 연결
 	        Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-
+	        
 	        // 외래 키 제약 조건 해제
 	        String disableForeignKeyCheck = "SET FOREIGN_KEY_CHECKS=0";
 	        PreparedStatement disableFkStmt = conn.prepareStatement(disableForeignKeyCheck);
@@ -276,7 +284,7 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 	        deleteReservationStmt.executeUpdate();
 
 	        // 좌석 상태 변경
-	        String updateSeatStatusQuery = "UPDATE seats SET seatStatus = '예약가능' WHERE seatNumber IN (SELECT seatNumber FROM reservations WHERE uId = ?)";
+	        String updateSeatStatusQuery = "UPDATE seats SET seatStatus = '예약 가능' WHERE seatNumber IN (SELECT seatNumber FROM reservations WHERE uId = ?)";
 	        PreparedStatement updateSeatStatusStmt = conn.prepareStatement(updateSeatStatusQuery);
 	        updateSeatStatusStmt.setString(1, userId);
 	        updateSeatStatusStmt.executeUpdate();
@@ -305,6 +313,43 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 	        JOptionPane.showMessageDialog(this, "데이터베이스 오류", "오류", JOptionPane.ERROR_MESSAGE);
 	    }
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		Object obj = e.getSource();
+		if(obj == lblLogout) {
+			int confirm = JOptionPane.showConfirmDialog(null, "정말로 로그아웃하시겠습니까?", "로그아웃", JOptionPane.YES_NO_OPTION);
+			if (confirm == JOptionPane.YES_OPTION) {
+	            setVisible(false);
+	            new LoginFrame();
+	        }
+		}
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 
 

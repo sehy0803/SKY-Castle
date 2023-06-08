@@ -127,10 +127,6 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
             for (int row = 0; row < 5; row++) {
                 for (int col = 0; col < 5; col++) {
                     if (obj == seatButtons[row][col]) {
-                        if (!seatStatus[row][col]) { // 이미 예약된 좌석인 경우
-                            JOptionPane.showMessageDialog(this, "해당 좌석은 이미 예약되었습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
-                            return;
-                        }
                         if (!canReserveMoreSeats()) { // 더 이상 예약 가능한 좌석이 없는 경우
                             JOptionPane.showMessageDialog(this, "더 이상 예약할 수 없습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
                             return;
@@ -149,41 +145,28 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
     }
 
     
-    // 예약한 좌석이 있는지 확인
+    // 회원이 예약한 좌석이 없는 경우
     private boolean canReserveMoreSeats() {
         int reservedSeatCount = 0;
 
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            String loadReservationsSql = "SELECT COUNT(*) AS reservedSeats FROM reservations WHERE uId = ?";
-            PreparedStatement pstmt = conn.prepareStatement(loadReservationsSql);
+            // Count reserved seats for the logged-in user
+            String loadUserReservationsSql = "SELECT COUNT(*) AS reservedSeats FROM reservations WHERE uId = ?";
+            PreparedStatement pstmt = conn.prepareStatement(loadUserReservationsSql);
             pstmt.setString(1, loggedInUserId);
-            ResultSet reservationsResult = pstmt.executeQuery();
+            ResultSet userReservationsResult = pstmt.executeQuery();
 
-            if (reservationsResult.next()) {
-                reservedSeatCount = reservationsResult.getInt("reservedSeats");
+            if (userReservationsResult.next()) {
+                reservedSeatCount = userReservationsResult.getInt("reservedSeats");
             }
-
+            
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
-        int totalReservedSeatCount = reservedSeatCount;
-
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            String loadSeatsSql = "SELECT COUNT(*) AS totalReservedSeats FROM seats WHERE seatStatus = '예약 불가능'";
-            Statement stmt = conn.createStatement();
-            ResultSet seatsResult = stmt.executeQuery(loadSeatsSql);
-
-            if (seatsResult.next()) {
-                totalReservedSeatCount += seatsResult.getInt("totalReservedSeats");
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        return totalReservedSeatCount < 1; // 최대 1개의 좌석을 예약 가능하도록 설정
+        return reservedSeatCount < 1; // Allow reserving up to 1 seat
     }
+
 
 
 
@@ -196,7 +179,7 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
     }
     
     
- // 좌석 상태 가져오기
+    // 좌석 상태 가져오기
     private void loadSeatStatus() {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
             String loadSeatsSql = "SELECT seatNumber, seatStatus FROM seats";
@@ -212,6 +195,9 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
                 seatStatus[row][col] = seatStatusStr.equals("예약 가능");
 
                 String seatStatusText = seatStatus[row][col] ? Integer.toString(seatNumber) : "예약 불가능";
+                if(seatStatusText.equals("예약 불가능")) {
+                	seatButtons[row][col].setEnabled(false);
+                }
                 seatButtons[row][col].setText(seatStatusText);
             }
         } catch (SQLException ex) {
