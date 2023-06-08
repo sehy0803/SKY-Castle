@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import ksh.RoundedButton;
 
@@ -28,9 +29,14 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
     private static final String URL = "jdbc:mysql://localhost/studycafe";
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
-
-    public SeatMovementFrame(String userId) {
+    
+    private int previousRow; // 이전 좌석의 행
+    private int previousCol; // 이전 좌석의 열
+    
+    public SeatMovementFrame(String userId, int previousRow, int previousCol) {
         this.loggedInUserId = userId;
+        this.previousRow = previousRow;
+        this.previousCol = previousCol;
         setTitle("스카이캐슬");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 800);
@@ -77,10 +83,9 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
             for (int col = 0; col < 5; col++) {
                 RoundedButton seatButton = new RoundedButton((row * 5 + col + 1) + "번");
                 seatButton.setFont(fontE);
-                seatButton.setEnabled(false); // 버튼 비활성화
+                seatButton.addActionListener(this);
                 seatPanel.add(seatButton);
                 seatButtons[row][col] = seatButton;
-                seatStatus[row][col] = false;
             }
         }
 
@@ -117,37 +122,97 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
         return panel;
     }
 
-    public static void main(String[] args) {
-    	SeatMovementFrame seatMovementFrame = new SeatMovementFrame(loggedInUserId);
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
-    	Object obj = e.getSource();
-    	if (obj == btnBack) {
+        Object obj = e.getSource();
+        if (obj == btnBack) {
             new MainFrame(loggedInUserId);
             setVisible(false);
-    	}
-    }
-    
-    // 좌석 상태 가져오기 -  좌석현황UI
-    private void loadSeatStatus() {
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            String sql = "SELECT seatNumber FROM reservations";
-            PreparedStatement statement = conn.prepareStatement(sql);
-
-            ResultSet result = statement.executeQuery();
-            while (result.next()) {
-                int seatNumber = result.getInt("seatNumber");
-                int row = (seatNumber - 1) / 5;
-                int col = (seatNumber - 1) % 5;
-                seatStatus[row][col] = true;
-                seatButtons[row][col].setText("예약됨");
+        } else {
+            // 좌석 버튼 클릭 시 동작
+            for (int row = 0; row < 5; row++) {
+                for (int col = 0; col < 5; col++) {
+                    if (obj == seatButtons[row][col]) {
+                        int confirmation = JOptionPane.showConfirmDialog(this, "해당 좌석으로 이동하시겠습니까?", "좌석이동", JOptionPane.YES_NO_OPTION);
+                        if (confirmation == JOptionPane.YES_OPTION) {
+                            if (seatStatus[row][col]) {
+                                int seatNumber = row * 5 + col + 1;
+                                updateSeatStatus(seatNumber, "예약 불가능");
+                                updatePreviousSeatStatus(previousRow, previousCol);
+                                JOptionPane.showMessageDialog(this, "좌석이 이동되었습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+                                setVisible(false);
+                                new MainFrame(loggedInUserId);
+                            }
+                        }
+                        break;
+                    }
+                }
             }
+        }
+    }
+
+    // 이동한 좌석 상태 업데이트
+    private void updateSeatStatus(int seatNumber, String status) {
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+        	// seats 테이블 업데이트
+        	String updateSeatStatusSql = "UPDATE seats SET seatStatus = ? WHERE seatNumber = ?";
+        	PreparedStatement updateSeatStatusStatement = conn.prepareStatement(updateSeatStatusSql);
+        	updateSeatStatusStatement.setString(1, status);
+        	updateSeatStatusStatement.setInt(2, seatNumber);
+        	updateSeatStatusStatement.executeUpdate();
+        	
+            // reservations 테이블 업데이트
+            String updateReservationSeatSql = "UPDATE reservations SET seatNumber = ? WHERE uId = ?";
+            PreparedStatement updateReservationSeatStatement = conn.prepareStatement(updateReservationSeatSql);
+            updateReservationSeatStatement.setInt(1, seatNumber);
+            updateReservationSeatStatement.setString(2, loggedInUserId);
+            updateReservationSeatStatement.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    
+    // 이전 좌석 상태 업데이트
+    private void updatePreviousSeatStatus(int row, int col) {
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            String updateSeatStatusSql = "UPDATE seats SET seatStatus = ? WHERE seatNumber = ?";
+            PreparedStatement updateSeatStatusStatement = conn.prepareStatement(updateSeatStatusSql);
+            updateSeatStatusStatement.setString(1, "예약 가능");
+            int seatNumber = row * 5 + col + 1;
+            updateSeatStatusStatement.setInt(2, seatNumber);
+            updateSeatStatusStatement.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
+    
+    // 좌석 상태 가져오기
+    private void loadSeatStatus() {
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            String loadSeatsSql = "SELECT seatNumber, seatStatus FROM seats";
+            Statement stmt = conn.createStatement();
+            ResultSet seatsResult = stmt.executeQuery(loadSeatsSql);
+
+            while (seatsResult.next()) {
+                int seatNumber = seatsResult.getInt("seatNumber");
+                int row = (seatNumber - 1) / 5;
+                int col = (seatNumber - 1) % 5;
+
+                String seatStatusStr = seatsResult.getString("seatStatus");
+                seatStatus[row][col] = seatStatusStr.equals("예약 가능");
+
+                String seatStatusText = seatStatus[row][col] ? Integer.toString(seatNumber) : "예약 불가능";
+                if(seatStatusText.equals("예약 불가능")) {
+                	seatButtons[row][col].setEnabled(false);
+                }
+                seatButtons[row][col].setText(seatStatusText);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
 
 }

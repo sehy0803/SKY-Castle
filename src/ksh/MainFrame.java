@@ -127,7 +127,6 @@ public class MainFrame extends JFrame implements ActionListener {
             setVisible(false);
         } else if (obj == btnMovement) {
             // 좌석이동
-        
         	boolean hasReservation = checkReservation(loggedInUserId); // 회원의 예약 여부 확인
             if (hasReservation) {
                 int confirmation = JOptionPane.showConfirmDialog(this, "예약된 좌석이 있습니다. 현재 좌석을 이동하시겠습니까?", "좌석이동", JOptionPane.YES_NO_OPTION);
@@ -175,7 +174,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		int col = (reservedSeatNumber - 1) % 5;
 
 		// SeatMovementFrame 객체 생성
-		SeatMovementFrame seatMovementFrame = new SeatMovementFrame(loggedInUserId);
+		SeatMovementFrame seatMovementFrame = new SeatMovementFrame(loggedInUserId, row, col);
 		seatMovementFrame.setVisible(true);
 		setVisible(false);
 	}
