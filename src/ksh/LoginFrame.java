@@ -18,8 +18,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class LoginFrame extends JFrame implements ActionListener {
+    private static LoginFrame loginFrame;
     private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
     private JPanel panel;
     private RoundedButton btnLogin;
@@ -27,11 +29,15 @@ public class LoginFrame extends JFrame implements ActionListener {
     private JTextField tfId;
     private JPasswordField tfPw;
 
+    private String loggedInUserId;
+
     // JDBC 연결 정보
     private static final String URL = "jdbc:mysql://localhost/studycafe";
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
-    
+
+    private LoginListener loginListener;
+
     public LoginFrame() {
         setTitle("스카이캐슬");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -117,14 +123,18 @@ public class LoginFrame extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
-        LoginFrame loginFrame = new LoginFrame();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                loginFrame = new LoginFrame();
+            }
+        });
     }
 
     // 액션 리스너
     @Override
     public void actionPerformed(ActionEvent e) {
         Object obj = e.getSource();
-        if (obj == btnLogin) {
+        if (obj == btnLogin || obj == tfPw) {
             doLogin();
         } else if (obj == btnRegister) {
             new RegisterFrame();
@@ -132,9 +142,13 @@ public class LoginFrame extends JFrame implements ActionListener {
         }
     }
 
+    public void setLoginListener(LoginListener listener) {
+        this.loginListener = listener;
+    }
+
     // 로그인 기능
     private void doLogin() {
-    	String id = tfId.getText();
+        String id = tfId.getText();
         char[] passwordChars = tfPw.getPassword();
         String password = new String(passwordChars);
 
@@ -145,7 +159,7 @@ public class LoginFrame extends JFrame implements ActionListener {
 
         try {
             // JDBC 드라이버 로드
-        	Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
 
             // 데이터베이스 연결
             Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -159,13 +173,14 @@ public class LoginFrame extends JFrame implements ActionListener {
 
             if (rs.next()) {
                 // 로그인 성공
-                String userId = rs.getString("uId"); // 회원 아이디 가져오기
+                loggedInUserId = rs.getString("uId"); // 로그인한 사용자의 아이디를 저장
                 JOptionPane.showMessageDialog(this, "로그인 성공!");
-                
-                dispose();
-                
-                MainFrame mainFrame = new MainFrame(userId); // 아이디를 전달하여 MainFrame 생성
-                mainFrame.setVisible(true);
+
+                setVisible(false);
+                MainFrame mainFrame = new MainFrame(loggedInUserId);
+                if (loginListener != null) {
+                    loginListener.onLoginSuccess(loggedInUserId);
+                }
             } else {
                 // 로그인 실패
                 JOptionPane.showMessageDialog(this, "아이디 또는 비밀번호가 올바르지 않습니다.", "로그인 실패", JOptionPane.ERROR_MESSAGE);

@@ -9,11 +9,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import ksh.RoundedButton;
 
-public class SeatStatusFrame extends JFrame implements ActionListener {
+public class SeatMovementFrame extends JFrame implements ActionListener {
     private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
     private Font fontB = new Font("맑은 고딕", Font.PLAIN, 15);
     private Font fontC = new Font("맑은 고딕", Font.BOLD, 25);
@@ -30,7 +29,7 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
 
-    public SeatStatusFrame(String userId) {
+    public SeatMovementFrame(String userId) {
         this.loggedInUserId = userId;
         setTitle("스카이캐슬");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -48,7 +47,7 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
     }
     
     private void setLabel() {
-    	JLabel lblSeatStatus = new JLabel("좌석현황");
+    	JLabel lblSeatStatus = new JLabel("좌석이동");
     	lblSeatStatus.setFont(fontD);
     	lblSeatStatus.setBounds(60, 12, 150, 30);
     	lblSeatStatus.setForeground(new Color(125, 83, 154));
@@ -81,6 +80,7 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
                 seatButton.setEnabled(false); // 버튼 비활성화
                 seatPanel.add(seatButton);
                 seatButtons[row][col] = seatButton;
+                seatStatus[row][col] = false;
             }
         }
 
@@ -117,6 +117,10 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
         return panel;
     }
 
+    public static void main(String[] args) {
+    	SeatMovementFrame seatMovementFrame = new SeatMovementFrame(loggedInUserId);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
     	Object obj = e.getSource();
@@ -126,38 +130,24 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
     	}
     }
     
- // 좌석 상태 가져오기
+    // 좌석 상태 가져오기 -  좌석현황UI
     private void loadSeatStatus() {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            String loadSeatsSql = "SELECT seatNumber, seatStatus FROM seats";
-            Statement stmt = conn.createStatement();
-            ResultSet seatsResult = stmt.executeQuery(loadSeatsSql);
+            String sql = "SELECT seatNumber FROM reservations";
+            PreparedStatement statement = conn.prepareStatement(sql);
 
-            while (seatsResult.next()) {
-                int seatNumber = seatsResult.getInt("seatNumber");
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                int seatNumber = result.getInt("seatNumber");
                 int row = (seatNumber - 1) / 5;
                 int col = (seatNumber - 1) % 5;
-
-                String seatStatusStr = seatsResult.getString("seatStatus");
-                seatStatus[row][col] = seatStatusStr.equals("예약 가능");
-
-                String seatStatusText = seatStatus[row][col] ? Integer.toString(seatNumber) : "예약 불가능";
-                seatButtons[row][col].setText(seatStatusText);
+                seatStatus[row][col] = true;
+                seatButtons[row][col].setText("예약됨");
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
-
-
-
-
-
-
-
-
-
-
 
 
 }

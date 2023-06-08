@@ -122,10 +122,21 @@ public class MainFrame extends JFrame implements ActionListener {
         Object obj = e.getSource();
         if (obj == btnReserve) {
             // 좌석예약
-            new SeatReserveFrame(loggedInUserId);
+            SeatReserveFrame seatReserveFrame = new SeatReserveFrame(loggedInUserId);
+            seatReserveFrame.setVisible(true);
             setVisible(false);
         } else if (obj == btnMovement) {
             // 좌석이동
+        
+        	boolean hasReservation = checkReservation(loggedInUserId); // 회원의 예약 여부 확인
+            if (hasReservation) {
+                int confirmation = JOptionPane.showConfirmDialog(this, "예약된 좌석이 있습니다. 현재 좌석을 이동하시겠습니까?", "좌석이동", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_OPTION) {
+                	doMovement();
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "예약한 좌석이 없습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
+            }
         } else if (obj == btnStatus) {
             // 좌석현황
             new SeatStatusFrame(loggedInUserId);
@@ -145,16 +156,47 @@ public class MainFrame extends JFrame implements ActionListener {
             }
         } else if (obj == btnMySeat) {
             // 내 좌석
-        	new MySeatFrame(loggedInUserId);
-        	setVisible(false);
+            new MySeatFrame(loggedInUserId);
+            setVisible(false);
         } else if (obj == btnUserInfo) {
             // 회원정보
             new UserInfoFrame(loggedInUserId);
             setVisible(false);
         }
     }
+
+	private void doMovement() {
+		int reservedSeatNumber = getReservedSeatNumber(loggedInUserId);
+
+		// 좌석 번호를 행과 열로 변환하여 row와 col에 할당
+		int row = (reservedSeatNumber - 1) / 5;
+		int col = (reservedSeatNumber - 1) % 5;
+
+		// SeatMovementFrame 객체 생성
+		SeatMovementFrame seatMovementFrame = new SeatMovementFrame(loggedInUserId);
+		seatMovementFrame.setVisible(true);
+		setVisible(false);
+	}
     
-    // 회원의 예약 여부 확인
+    // 회원의 예약된 좌석 번호 가져오기
+    private int getReservedSeatNumber(String loggedInUserId) {
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+            String sql = "SELECT seatNumber FROM reservations WHERE uId = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, loggedInUserId);
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                int seatNumber = rs.getInt("seatNumber");
+                return seatNumber;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return 0; // 예약된 좌석 번호가 없을 경우 0을 반환
+    }
+
+	// 회원의 예약 여부 확인
     private boolean checkReservation(String userId) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
             String sql = "SELECT COUNT(*) AS count FROM reservations WHERE uId = ?";
@@ -180,7 +222,12 @@ public class MainFrame extends JFrame implements ActionListener {
             PreparedStatement deleteReservationStatement = conn.prepareStatement(deleteReservationSql);
             deleteReservationStatement.setString(1, userId);
             deleteReservationStatement.executeUpdate();
-
+            
+            String deleteSeatsSql = "DELETE FROM seats WHERE uId = ?";
+            PreparedStatement deleteSeatsStatement = conn.prepareStatement(deleteSeatsSql);
+            deleteSeatsStatement.setString(1, userId);
+            deleteSeatsStatement.executeUpdate();
+            
             String updateUsersSql = "UPDATE users SET uSeat = NULL, reservationTime = NULL WHERE uId = ?";
             PreparedStatement updateUsersStatement = conn.prepareStatement(updateUsersSql);
             updateUsersStatement.setString(1, userId);
@@ -189,9 +236,4 @@ public class MainFrame extends JFrame implements ActionListener {
             ex.printStackTrace();
         }
     }
-
-
-
-
-    
 }

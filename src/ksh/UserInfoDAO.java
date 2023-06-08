@@ -33,10 +33,8 @@ public class UserInfoDAO {
                 String name = resultSet.getString("uName");
                 String password = resultSet.getString("uPw");
                 String phone = resultSet.getString("uPhone");
-                int seatNumber = resultSet.getInt("uSeat");
-                String reservedTime = resultSet.getString("reservation_time");
 
-                return new User(name, userId, password, phone, seatNumber, reservedTime);
+                return new User(name, userId, password, phone);
             }
         } catch (SQLException e) {
             e.printStackTrace();

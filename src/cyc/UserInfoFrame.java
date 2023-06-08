@@ -215,8 +215,6 @@ public class UserInfoFrame extends JFrame implements ActionListener {
         String userId = loggedInUserId; // 로그인한 사용자의 아이디
         String password = ""; // 비밀번호
         String phone = ""; // 전화번호
-        int seatNumber = 0; // 좌석번호
-		String reservedTime = null; // 예약시간
 		
         try {
             // 데이터베이스 연결
@@ -239,7 +237,7 @@ public class UserInfoFrame extends JFrame implements ActionListener {
             e.printStackTrace();
         }
 		
-		return new User(name, userId, password, phone, seatNumber, reservedTime);
+		return new User(name, userId, password, phone);
     }
 	
 	// 회원 정보 설정
@@ -250,50 +248,64 @@ public class UserInfoFrame extends JFrame implements ActionListener {
 		infoPhone.setText(user.getPhone());
 	}
    
-	// 회원 탈퇴 기능
-    private void doUnRegister() {
-            String userId = infoId.getText(); // 회원 아이디 가져오기
+	private void doUnRegister() {
+	    String userId = infoId.getText(); // 회원 아이디 가져오기
 
-            try {
-                // JDBC 드라이버 로드
-                Class.forName("com.mysql.cj.jdbc.Driver");
+	    try {
+	        // JDBC 드라이버 로드
+	        Class.forName("com.mysql.cj.jdbc.Driver");
 
-                // 데이터베이스 연결
-                Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+	        // 데이터베이스 연결
+	        Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
 
-                // 외래 키 제약 조건 해제
-                String disableForeignKeyCheck = "SET FOREIGN_KEY_CHECKS=0";
-                PreparedStatement disableFkStmt = conn.prepareStatement(disableForeignKeyCheck);
-                disableFkStmt.executeUpdate();
+	        // 외래 키 제약 조건 해제
+	        String disableForeignKeyCheck = "SET FOREIGN_KEY_CHECKS=0";
+	        PreparedStatement disableFkStmt = conn.prepareStatement(disableForeignKeyCheck);
+	        disableFkStmt.executeUpdate();
 
-                // 회원 삭제
-                String deleteUserQuery = "DELETE FROM users WHERE uId = ?";
-                PreparedStatement deleteUserStmt = conn.prepareStatement(deleteUserQuery);
-                deleteUserStmt.setString(1, userId);
-                int rowsAffected = deleteUserStmt.executeUpdate();
+	        // 회원 삭제
+	        String deleteUserQuery = "DELETE FROM users WHERE uId = ?";
+	        PreparedStatement deleteUserStmt = conn.prepareStatement(deleteUserQuery);
+	        deleteUserStmt.setString(1, userId);
+	        int rowsAffected = deleteUserStmt.executeUpdate();
 
-                // 외래 키 제약 조건 복원
-                String enableForeignKeyCheck = "SET FOREIGN_KEY_CHECKS=1";
-                PreparedStatement enableFkStmt = conn.prepareStatement(enableForeignKeyCheck);
-                enableFkStmt.executeUpdate();
+	        // 예약 정보 삭제
+	        String deleteReservationQuery = "DELETE FROM reservations WHERE uId = ?";
+	        PreparedStatement deleteReservationStmt = conn.prepareStatement(deleteReservationQuery);
+	        deleteReservationStmt.setString(1, userId);
+	        deleteReservationStmt.executeUpdate();
 
-                if (rowsAffected > 0) {
-                    JOptionPane.showMessageDialog(this, "회원탈퇴가 완료되었습니다.");
-                    dispose();
-                    new LoginFrame();
-                } else {
-                    JOptionPane.showMessageDialog(this, "회원탈퇴에 실패했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
-                }
+	        // 좌석 상태 변경
+	        String updateSeatStatusQuery = "UPDATE seats SET seatStatus = '예약가능' WHERE seatNumber IN (SELECT seatNumber FROM reservations WHERE uId = ?)";
+	        PreparedStatement updateSeatStatusStmt = conn.prepareStatement(updateSeatStatusQuery);
+	        updateSeatStatusStmt.setString(1, userId);
+	        updateSeatStatusStmt.executeUpdate();
 
-                disableFkStmt.close();
-                deleteUserStmt.close();
-                enableFkStmt.close();
-                conn.close();
-            } catch (ClassNotFoundException | SQLException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "데이터베이스 오류", "오류", JOptionPane.ERROR_MESSAGE);
-            }
-    }
+	        // 외래 키 제약 조건 복원
+	        String enableForeignKeyCheck = "SET FOREIGN_KEY_CHECKS=1";
+	        PreparedStatement enableFkStmt = conn.prepareStatement(enableForeignKeyCheck);
+	        enableFkStmt.executeUpdate();
+
+	        if (rowsAffected > 0) {
+	            JOptionPane.showMessageDialog(this, "회원탈퇴가 완료되었습니다.");
+	            dispose();
+	            new LoginFrame();
+	        } else {
+	            JOptionPane.showMessageDialog(this, "회원탈퇴에 실패했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+	        }
+
+	        disableFkStmt.close();
+	        deleteUserStmt.close();
+	        deleteReservationStmt.close();
+	        updateSeatStatusStmt.close();
+	        enableFkStmt.close();
+	        conn.close();
+	    } catch (ClassNotFoundException | SQLException e) {
+	        e.printStackTrace();
+	        JOptionPane.showMessageDialog(this, "데이터베이스 오류", "오류", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+
 
 
 }

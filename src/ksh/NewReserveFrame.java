@@ -12,6 +12,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -248,66 +249,47 @@ public class NewReserveFrame extends JFrame implements ActionListener {
     private boolean performPayment(int totalPrice) {
         return true;
     }
-    
-    // 좌석 상태 가져오기
-    private void loadReservedSeats() {
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            String sql = "SELECT seatNumber FROM reservations WHERE uId = ?";
-            PreparedStatement statement = conn.prepareStatement(sql);
-            statement.setString(1, loggedInUserId);
 
-            ResultSet result = statement.executeQuery();
-            while (result.next()) {
-                int seatNumber = result.getInt("seatNumber");
-                int row = (seatNumber - 1) / 5;
-                int col = (seatNumber - 1) % 5;
-                seatStatus[row][col] = true;
-                seatButtons[row][col].setText("예약됨");
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    // 좌석 상태 저장
+    // 데이터베이스 저장
     private void reserveSeatInDatabase(int row, int col, int reservationTime) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-        	String insertReservationSql = "INSERT INTO reservations (uId, reservationStartTime, reservationEndTime, reservationTime, seatNumber) VALUES (?, ?, ?, ?, ?)";
-        	PreparedStatement insertReservationStatement = conn.prepareStatement(insertReservationSql);
-        	insertReservationStatement.setString(1, loggedInUserId);
+            // 예약 정보 저장
+            String insertReservationSql = "INSERT INTO reservations (uId, seatNumber, reservationTime, reservationStartTime, reservationEndTime) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement insertReservationStatement = conn.prepareStatement(insertReservationSql, Statement.RETURN_GENERATED_KEYS);
+            insertReservationStatement.setString(1, loggedInUserId);
+            insertReservationStatement.setInt(2, row * 5 + col + 1);
+            insertReservationStatement.setInt(3, reservationTime);
 
-        	// 시작 시간 계산
-        	Timestamp reservationStartTime = new Timestamp(System.currentTimeMillis());
-        	insertReservationStatement.setTimestamp(2, reservationStartTime);
+            // 시작 시간 계산
+            Timestamp reservationStartTime = new Timestamp(System.currentTimeMillis());
+            insertReservationStatement.setTimestamp(4, reservationStartTime);
 
-        	// 종료 시간 계산
-        	Calendar cal = Calendar.getInstance();
-        	cal.setTimeInMillis(reservationStartTime.getTime());
-        	cal.add(Calendar.HOUR, reservationTime);
-        	Timestamp reservationEndTime = new Timestamp(cal.getTime().getTime());
-        	insertReservationStatement.setTimestamp(3, reservationEndTime);
+            // 종료 시간 계산
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(reservationStartTime.getTime());
+            cal.add(Calendar.HOUR, reservationTime);
+            Timestamp reservationEndTime = new Timestamp(cal.getTime().getTime());
+            insertReservationStatement.setTimestamp(5, reservationEndTime);
 
-        	insertReservationStatement.setInt(4, reservationTime);
-        	insertReservationStatement.setInt(5, row * 5 + col + 1);
-        	insertReservationStatement.executeUpdate();
+            insertReservationStatement.executeUpdate();
 
-            String updateUsersSql = "UPDATE users SET uSeat = ?, reservationTime = ? WHERE uId = ?";
-            PreparedStatement updateUsersStatement = conn.prepareStatement(updateUsersSql);
-            updateUsersStatement.setInt(1, row * 5 + col + 1);
-            updateUsersStatement.setInt(2, reservationTime);
-            updateUsersStatement.setString(3, loggedInUserId);
-            updateUsersStatement.executeUpdate();
-            
+            // 예약된 좌석 업데이트
+            String updateSeatsSql = "UPDATE seats SET seatStatus = '예약 불가능' WHERE seatNumber = ?";
+            PreparedStatement updateSeatsStatement = conn.prepareStatement(updateSeatsSql);
+            updateSeatsStatement.setInt(1, row * 5 + col + 1);
+            updateSeatsStatement.executeUpdate();
+
             // 예약 정보 출력
             System.out.println("선택한 예약시간: " + reservationTime);
-            
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             System.out.println("예약 시작 시간: " + dateFormat.format(reservationStartTime));
             System.out.println("예약 종료 시간: " + dateFormat.format(reservationEndTime));
-            
+
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
+
+
 
 }
