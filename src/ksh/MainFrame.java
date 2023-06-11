@@ -17,8 +17,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import cyc.SeatReserveFrame;
 import cyc.UserInfoFrame;
-
+// 메인 프레임
 public class MainFrame extends JFrame implements ActionListener {
     private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
     private JPanel panel;
@@ -50,7 +51,8 @@ public class MainFrame extends JFrame implements ActionListener {
 
         setVisible(true);
     }
-
+    
+    // 버튼 설정
     private void setButton() {
         btnReserve = new RoundedButton("좌석예약");
         btnReserve.setFont(fontA);
@@ -116,7 +118,8 @@ public class MainFrame extends JFrame implements ActionListener {
         setContentPane(panel); // JFrame의 컨텐트팬을 JPanel로 설정
         return panel;
     }
-
+    
+    // 액션 리스너
     @Override
     public void actionPerformed(ActionEvent e) {
         Object obj = e.getSource();
@@ -127,7 +130,7 @@ public class MainFrame extends JFrame implements ActionListener {
             setVisible(false);
         } else if (obj == btnMovement) {
             // 좌석이동
-        	boolean hasReservation = checkReservation(loggedInUserId); // 회원의 예약 여부 확인
+        	boolean hasReservation = checkReservation(loggedInUserId); // 사용자의 예약 여부 확인
             if (hasReservation) {
                 int confirmation = JOptionPane.showConfirmDialog(this, "예약된 좌석이 있습니다. 현재 좌석을 이동하시겠습니까?", "좌석이동", JOptionPane.YES_NO_OPTION);
                 if (confirmation == JOptionPane.YES_OPTION) {
@@ -143,7 +146,7 @@ public class MainFrame extends JFrame implements ActionListener {
         } else if (obj == btnLeave) {
             // 퇴실
             boolean hasReservation = checkReservation(loggedInUserId); // 회원의 예약 여부 확인
-            if (hasReservation) {
+            if (hasReservation) { // 예약한 좌석이 있을 경우
                 int confirmation = JOptionPane.showConfirmDialog(this, "예약된 좌석이 있습니다. 예약을 취소하고 퇴실하시겠습니까?", "퇴실", JOptionPane.YES_NO_OPTION);
                 if (confirmation == JOptionPane.YES_OPTION) {
                     cancelReservation(loggedInUserId); // 사용자의 좌석 예약 취소
@@ -164,7 +167,6 @@ public class MainFrame extends JFrame implements ActionListener {
         }
     }
     
-    
     // 좌석이동
 	private void doMovement() {
 		int reservedSeatNumber = getReservedSeatNumber(loggedInUserId);
@@ -173,15 +175,16 @@ public class MainFrame extends JFrame implements ActionListener {
 		int row = (reservedSeatNumber - 1) / 5;
 		int col = (reservedSeatNumber - 1) % 5;
 
-		// SeatMovementFrame 객체 생성
+		// 사용자가 예약한 좌석의 번호를 전달하여 SeatMovementFrame 객체 생성
 		SeatMovementFrame seatMovementFrame = new SeatMovementFrame(loggedInUserId, row, col);
 		seatMovementFrame.setVisible(true);
 		setVisible(false);
 	}
     
-    // 회원의 예약된 좌석 번호 가져오기
+    // 사용자가 예약한 좌석 번호 가져오기
     private int getReservedSeatNumber(String loggedInUserId) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+        	// 예약 테이블에서 사용자의 좌석 번호 가져오기
             String sql = "SELECT seatNumber FROM reservations WHERE uId = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, loggedInUserId);
@@ -197,9 +200,10 @@ public class MainFrame extends JFrame implements ActionListener {
         return 0; // 예약된 좌석 번호가 없을 경우 0을 반환
     }
 
-	// 회원의 예약 여부 확인
+	// 사용자의 예약 여부 확인
     private boolean checkReservation(String userId) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+        	// 예약 테이블에서 사용자의 예약 수를 count 변수에 저장
             String sql = "SELECT COUNT(*) AS count FROM reservations WHERE uId = ?";
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setString(1, userId);
@@ -215,15 +219,16 @@ public class MainFrame extends JFrame implements ActionListener {
         return false;
     }
     
-    
-    // 예약 취소
+    // 퇴실 기능
     private void cancelReservation(String userId) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+        	// 좌석 테이블 업데이트
         	String updateSeatsSql = "UPDATE seats SET seatStatus = '예약 가능' WHERE seatNumber IN (SELECT seatNumber FROM reservations WHERE uId = ?)";
         	PreparedStatement updateSeatsStatement = conn.prepareStatement(updateSeatsSql);
         	updateSeatsStatement.setString(1, userId);
         	updateSeatsStatement.executeUpdate();
         	
+        	// 예약 테이블에서 예약 정보 삭제
             String deleteReservationSql = "DELETE FROM reservations WHERE uId = ?";
             PreparedStatement deleteReservationStatement = conn.prepareStatement(deleteReservationSql);
             deleteReservationStatement.setString(1, userId);

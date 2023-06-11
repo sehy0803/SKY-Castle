@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-
+// 로그인 프레임
 public class LoginFrame extends JFrame implements ActionListener {
     private static LoginFrame loginFrame;
     private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
@@ -29,14 +29,12 @@ public class LoginFrame extends JFrame implements ActionListener {
     private JTextField tfId;
     private JPasswordField tfPw;
 
-    private String loggedInUserId;
+    private String loggedInUserId; // 로그인한 사용자의 아이디
 
     // JDBC 연결 정보
     private static final String URL = "jdbc:mysql://localhost/studycafe";
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
-
-    private LoginListener loginListener;
 
     public LoginFrame() {
         setTitle("스카이캐슬");
@@ -134,18 +132,14 @@ public class LoginFrame extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Object obj = e.getSource();
-        if (obj == btnLogin || obj == tfPw) {
+        if (obj == btnLogin) {
             doLogin();
         } else if (obj == btnRegister) {
             new RegisterFrame();
             setVisible(false);
         }
     }
-
-    public void setLoginListener(LoginListener listener) {
-        this.loginListener = listener;
-    }
-
+    
     // 로그인 기능
     private void doLogin() {
         String id = tfId.getText();
@@ -178,9 +172,6 @@ public class LoginFrame extends JFrame implements ActionListener {
 
                 setVisible(false);
                 MainFrame mainFrame = new MainFrame(loggedInUserId);
-                if (loginListener != null) {
-                    loginListener.onLoginSuccess(loggedInUserId);
-                }
             } else {
                 // 로그인 실패
                 JOptionPane.showMessageDialog(this, "아이디 또는 비밀번호가 올바르지 않습니다.", "로그인 실패", JOptionPane.ERROR_MESSAGE);

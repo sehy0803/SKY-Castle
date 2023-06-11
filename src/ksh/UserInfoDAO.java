@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+// 사용자 정보 DAO
 public class UserInfoDAO {
     private static final String URL = "jdbc:mysql://localhost/studycafe";
     private static final String USER = "root";

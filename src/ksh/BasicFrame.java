@@ -21,8 +21,6 @@ public class BasicFrame extends JFrame {
         backgroundImage();
         setLogo();
 
-
-
         setVisible(true);
     }
 

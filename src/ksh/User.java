@@ -1,5 +1,5 @@
 package ksh;
-
+// User 객체
 public class User {
     private String name;
     private String id;
@@ -14,19 +14,15 @@ public class User {
     }
 
     // Getter 메소드
-
     public String getName() {
         return name;
     }
-
     public String getId() {
         return id;
     }
-
     public String getPw() {
         return password;
     }
-
     public String getPhone() {
         return phone;
     }

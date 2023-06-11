@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
+// 회원가입 프레임
 public class RegisterFrame extends JFrame implements ActionListener {
     private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
     private Font fontB = new Font("맑은 고딕", Font.PLAIN, 15);
@@ -77,7 +77,7 @@ public class RegisterFrame extends JFrame implements ActionListener {
         panel.add(whitePanel);
     }
 
-    // Input 설정
+    // TextField 설정
     private void setInput() {
         tfId = new JTextField();
         tfId.setBounds(160, 30, 180, 30);
@@ -96,7 +96,7 @@ public class RegisterFrame extends JFrame implements ActionListener {
         whitePanel.add(tfPhone);
     }
 
-    // Label 설정
+    // 라벨 설정
     private void setLabel() {
         JLabel lblId = new JLabel("아이디");
         lblId.setFont(fontA);
@@ -160,12 +160,13 @@ public class RegisterFrame extends JFrame implements ActionListener {
 
     // 회원가입 기능
     private void doRegister() {
+    	// 사용자가 TextField에 입력한 글자를 변수에 저장
         String id = tfId.getText();
         String password = tfPw.getText();
         String name = tfName.getText();
         String phone = tfPhone.getText();
 
-        if (id.isEmpty() || password.isEmpty() || name.isEmpty() || phone.isEmpty()) {
+        if (id.isEmpty() || password.isEmpty() || name.isEmpty() || phone.isEmpty()) { // 빈 칸이 있을 시
             JOptionPane.showMessageDialog(this, "빈 칸을 모두 입력해주세요.", "오류", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -183,7 +184,7 @@ public class RegisterFrame extends JFrame implements ActionListener {
             checkStmt.setString(1, id);
             ResultSet resultSet = checkStmt.executeQuery();
             
-            if (resultSet.next()) {
+            if (resultSet.next()) { // 아이디가 중복될 경우
                 JOptionPane.showMessageDialog(this, "이미 존재하는 아이디입니다.", "오류", JOptionPane.ERROR_MESSAGE);
                 resultSet.close();
                 checkStmt.close();
@@ -191,7 +192,7 @@ public class RegisterFrame extends JFrame implements ActionListener {
                 return;
             }
 
-            // 쿼리 작성 및 실행
+            // 데이터베이스에 정보 저장
             String query = "INSERT INTO users (uId, uPw, uName, uPhone) VALUES (?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1, id);
@@ -200,8 +201,8 @@ public class RegisterFrame extends JFrame implements ActionListener {
             pstmt.setString(4, phone);
 
             int rowsAffected = pstmt.executeUpdate();
-
-            if (rowsAffected > 0) {
+            
+            if (rowsAffected > 0) { // 정상적으로 저장이 됐을 경우
                 JOptionPane.showMessageDialog(this, "회원가입 성공!");
                 new LoginFrame();
                 setVisible(false);
@@ -217,10 +218,5 @@ public class RegisterFrame extends JFrame implements ActionListener {
         } catch (ClassNotFoundException | SQLException ex) {
             ex.printStackTrace();
         }
-    }
-
-
-    public static void main(String[] args) {
-        RegisterFrame registerFrame = new RegisterFrame();
     }
 }

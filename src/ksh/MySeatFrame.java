@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 
 import ksh.RoundedButton;
-
+// 내 좌석 프레임
 public class MySeatFrame extends JFrame implements ActionListener {
     private Font fontA = new Font("맑은 고딕", Font.BOLD, 18);
     private Font fontB = new Font("맑은 고딕", Font.PLAIN, 15);
@@ -38,6 +38,7 @@ public class MySeatFrame extends JFrame implements ActionListener {
     
     private static String loggedInUserId; // 로그인한 사용자의 아이디
     
+    // JDBC 연결 정보
     private static final String URL = "jdbc:mysql://localhost/studycafe";
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
@@ -165,11 +166,8 @@ public class MySeatFrame extends JFrame implements ActionListener {
         setContentPane(panel);
         return panel;
     }
-
-    public static void main(String[] args) {
-    	MySeatFrame mySeatFrame = new MySeatFrame(loggedInUserId);
-    }
-
+    
+    // 액션 리스너
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object obj = e.getSource();
@@ -182,17 +180,20 @@ public class MySeatFrame extends JFrame implements ActionListener {
 	// 좌석 정보 표시
 	private void showSeatInformation() {
 	    try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+	    	// 예약 테이블에서 회원 정보 가져오기
 	        String selectReservationSql = "SELECT * FROM reservations WHERE uId = ?";
 	        PreparedStatement selectReservationStatement = conn.prepareStatement(selectReservationSql);
 	        selectReservationStatement.setString(1, loggedInUserId);
 	        ResultSet reservationRs = selectReservationStatement.executeQuery();
 
 	        if (reservationRs.next()) {
+	        	// 정보를 변수에 저장
 	            int seatNumber = reservationRs.getInt("seatNumber");
 	            int reservationTime = reservationRs.getInt("reservationTime");
 	            Timestamp reservationStartTime = reservationRs.getTimestamp("reservationStartTime");
 	            Timestamp reservationEndTime = reservationRs.getTimestamp("reservationEndTime");
 	            
+	            // Text 설정
 	            infoMySeat.setText(String.valueOf(seatNumber));
 	            infoReservationTime.setText(String.valueOf(reservationTime));
 	            infoReservationStartTime.setText(reservationStartTime.toString());

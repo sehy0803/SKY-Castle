@@ -10,7 +10,7 @@ import java.awt.RenderingHints;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
-
+// 예쁜 버튼
 public class RoundedButton extends JButton {
 	public RoundedButton() { super(); decorate(); } 
 	public RoundedButton(String text) { super(text); decorate(); } 

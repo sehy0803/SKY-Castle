@@ -1,4 +1,4 @@
-package ksh;
+package cyc;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,8 +11,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import ksh.MainFrame;
+import ksh.NewReserveFrame;
 import ksh.RoundedButton;
-
+// 좌석예약 프레임
 public class SeatReserveFrame extends JFrame implements ActionListener {
     private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
     private Font fontB = new Font("맑은 고딕", Font.PLAIN, 15);
@@ -26,6 +28,7 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
     
     private static String loggedInUserId; // 로그인한 사용자의 아이디
     
+    // JDBC 연결 정보
     private static final String URL = "jdbc:mysql://localhost/studycafe";
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
@@ -47,6 +50,7 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
         setVisible(true);
     }
     
+    // 라벨 설정
     private void setLabel() {
     	JLabel lblSeatReserve = new JLabel("좌석예약");
     	lblSeatReserve.setFont(fontD);
@@ -66,6 +70,7 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
     
     // 좌석 설정
     private void setSeatButtons() {
+    	// 좌석번호와 상태를 저장할 배열 생성
         seatButtons = new RoundedButton[5][5];
         seatStatus = new boolean[5][5];
 
@@ -85,7 +90,7 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
         }
 
         panel.add(seatPanel);
-        loadSeatStatus(); // 예약된 좌석을 로드하여 표시
+        loadSeatStatus();
     }
     
     // 로고 이미지 설정
@@ -115,6 +120,7 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
         return panel;
     }
     
+    // 액션 리스너
     @Override
     public void actionPerformed(ActionEvent e) {
         Object obj = e.getSource();
@@ -143,14 +149,13 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
 
         }
     }
-
     
-    // 회원이 예약한 좌석이 없는 경우
+    // 예약한 좌석이 없는 경우
     private boolean canReserveMoreSeats() {
         int reservedSeatCount = 0;
 
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            // Count reserved seats for the logged-in user
+        	// 예약 테이블에서 회원의 예약 수를 reservedSeats 변수에 저장
             String loadUserReservationsSql = "SELECT COUNT(*) AS reservedSeats FROM reservations WHERE uId = ?";
             PreparedStatement pstmt = conn.prepareStatement(loadUserReservationsSql);
             pstmt.setString(1, loggedInUserId);
@@ -164,24 +169,20 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
             ex.printStackTrace();
         }
 
-        return reservedSeatCount < 1; // Allow reserving up to 1 seat
+        return reservedSeatCount < 1; // 예약한 좌석의 수가 1 이하일 때. 즉 예약이 없는 경우
     }
 
-
-
-
-
-    // 결제 메서드
+    // 좌석 선택 후 결제 프레임으로 이동
     private void openReservationFrame(int row, int col) {
         NewReserveFrame newReserveFrame = new NewReserveFrame(loggedInUserId, row, col);
         setVisible(false);
         return;
     }
     
-    
     // 좌석 상태 가져오기
     private void loadSeatStatus() {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+        	// 좌석 테이블에서 좌석번호와 좌석상태 가져오기
             String loadSeatsSql = "SELECT seatNumber, seatStatus FROM seats";
             Statement stmt = conn.createStatement();
             ResultSet seatsResult = stmt.executeQuery(loadSeatsSql);
@@ -194,9 +195,10 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
                 String seatStatusStr = seatsResult.getString("seatStatus");
                 seatStatus[row][col] = seatStatusStr.equals("예약 가능");
 
-                String seatStatusText = seatStatus[row][col] ? Integer.toString(seatNumber) : "예약 불가능";
-                if(seatStatusText.equals("예약 불가능")) {
-                	seatButtons[row][col].setEnabled(false);
+                // 예약 가능한 좌석은 좌석번호(숫자)로, 예약된 좌석은 "사용중"(문자)으로 표시
+                String seatStatusText = seatStatus[row][col] ? Integer.toString(seatNumber) : "사용중";
+                if(seatStatusText.equals("사용중")) {
+                	seatButtons[row][col].setEnabled(false); // 예약된 좌석은 비활성화
                 }
                 seatButtons[row][col].setText(seatStatusText);
             }
@@ -204,12 +206,4 @@ public class SeatReserveFrame extends JFrame implements ActionListener {
             ex.printStackTrace();
         }
     }
-
-
-
-
-
-
-
-
 }

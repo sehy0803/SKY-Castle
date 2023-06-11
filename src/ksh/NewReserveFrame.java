@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 
 import ksh.RoundedButton;
-
+// 결제 프레임
 public class NewReserveFrame extends JFrame implements ActionListener {
     private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
     private Font fontB = new Font("맑은 고딕", Font.PLAIN, 15);
@@ -27,16 +27,16 @@ public class NewReserveFrame extends JFrame implements ActionListener {
     private Font fontD = new Font("맑은 고딕", Font.BOLD, 30);
     private JPanel panel;
     private RoundedButton btnBack;
-    private RoundedButton[][] seatButtons;
-    private boolean[][] seatStatus;
     private JComboBox<String> timeComboBox;
 	private RoundedButton btnPay;
 	private JTable table;
     
     private static String loggedInUserId; // 로그인한 사용자의 아이디
-    private static int row; // 좌석 - 행
-    private static int col; // 좌석 - 열
     
+    private static int row; // 사용자가 선택한 좌석 - 행
+    private static int col; // 사용자가 선택한 좌석 - 열
+    
+    // JDBC 연결 정보
     private static final String URL = "jdbc:mysql://localhost/studycafe";
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
@@ -63,7 +63,7 @@ public class NewReserveFrame extends JFrame implements ActionListener {
     
     // 라벨 설정
     private void setLabel() {
-    	JLabel payList = new JLabel("이용요금");
+    	JLabel payList = new JLabel("결제");
     	payList.setFont(fontD);
     	payList.setBounds(60, 12, 150, 30);
     	payList.setForeground(new Color(125, 83, 154));
@@ -136,8 +136,6 @@ public class NewReserveFrame extends JFrame implements ActionListener {
 
         panel.add(timeComboBox);
     }
-
-
 	
 	// 버튼 설정
 	private void setButton() {
@@ -180,11 +178,8 @@ public class NewReserveFrame extends JFrame implements ActionListener {
         setContentPane(panel);
         return panel;
     }
-
-    public static void main(String[] args) {
-    	NewReserveFrame newReserveFrame = new NewReserveFrame(loggedInUserId, row, col);
-    }
-
+    
+    // 액션 리스너
     @Override
     public void actionPerformed(ActionEvent e) {
         Object obj = e.getSource();
@@ -214,7 +209,6 @@ public class NewReserveFrame extends JFrame implements ActionListener {
             }
         }
     }
-
     
     // 예약 시간
     private int getSelectedHours(String selectedTime) {
@@ -246,11 +240,12 @@ public class NewReserveFrame extends JFrame implements ActionListener {
         }
     }
     
+    // 결제 과정
     private boolean performPayment(int totalPrice) {
-        return true;
+        return true; // 일단 무조건 결제 성공
     }
 
-    // 데이터베이스 저장
+    // 데이터베이스에 정보 저장
     private void reserveSeatInDatabase(int row, int col, int reservationTime) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
             // 예약 정보 저장
@@ -273,8 +268,8 @@ public class NewReserveFrame extends JFrame implements ActionListener {
 
             insertReservationStatement.executeUpdate();
 
-            // 예약된 좌석 업데이트
-            String updateSeatsSql = "UPDATE seats SET seatStatus = '예약 불가능' WHERE seatNumber = ?";
+            // 예약된 좌석의 상태를 "사용중"으로 업데이트
+            String updateSeatsSql = "UPDATE seats SET seatStatus = '사용중' WHERE seatNumber = ?";
             PreparedStatement updateSeatsStatement = conn.prepareStatement(updateSeatsSql);
             updateSeatsStatement.setInt(1, row * 5 + col + 1);
             updateSeatsStatement.executeUpdate();

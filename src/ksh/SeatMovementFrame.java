@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import ksh.RoundedButton;
-
+// 좌석이동 프레임
 public class SeatMovementFrame extends JFrame implements ActionListener {
     private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
     private Font fontB = new Font("맑은 고딕", Font.PLAIN, 15);
@@ -26,6 +26,7 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
     
     private static String loggedInUserId; // 로그인한 사용자의 아이디
     
+    // JDBC 연결 정보
     private static final String URL = "jdbc:mysql://localhost/studycafe";
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
@@ -52,6 +53,7 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
         setVisible(true);
     }
     
+    // 라벨 설정
     private void setLabel() {
     	JLabel lblSeatStatus = new JLabel("좌석이동");
     	lblSeatStatus.setFont(fontD);
@@ -71,6 +73,7 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
     
     // 좌석 설정
     private void setSeatButtons() {
+    	// 좌석번호와 상태를 저장할 배열 생성
         seatButtons = new RoundedButton[5][5];
         seatStatus = new boolean[5][5];
 
@@ -121,7 +124,8 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
         setContentPane(panel);
         return panel;
     }
-
+    
+    // 액션 리스너
     @Override
     public void actionPerformed(ActionEvent e) {
         Object obj = e.getSource();
@@ -137,8 +141,8 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
                         if (confirmation == JOptionPane.YES_OPTION) {
                             if (seatStatus[row][col]) {
                                 int seatNumber = row * 5 + col + 1;
-                                updateSeatStatus(seatNumber, "예약 불가능");
-                                updatePreviousSeatStatus(previousRow, previousCol);
+                                updateSeatStatus(seatNumber, "사용중"); // 이동할 좌석 상태 업데이트
+                                updatePreviousSeatStatus(previousRow, previousCol); // 이전 좌석 상태 업데이트
                                 JOptionPane.showMessageDialog(this, "좌석이 이동되었습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
                                 setVisible(false);
                                 new MainFrame(loggedInUserId);
@@ -154,14 +158,14 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
     // 이동한 좌석 상태 업데이트
     private void updateSeatStatus(int seatNumber, String status) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-        	// seats 테이블 업데이트
+        	// 좌석 테이블에서 좌석상태를 "사용중"으로 변경
         	String updateSeatStatusSql = "UPDATE seats SET seatStatus = ? WHERE seatNumber = ?";
         	PreparedStatement updateSeatStatusStatement = conn.prepareStatement(updateSeatStatusSql);
         	updateSeatStatusStatement.setString(1, status);
         	updateSeatStatusStatement.setInt(2, seatNumber);
         	updateSeatStatusStatement.executeUpdate();
         	
-            // reservations 테이블 업데이트
+            // 예약 테이블에서 예약 정보의 좌석번호 변경
             String updateReservationSeatSql = "UPDATE reservations SET seatNumber = ? WHERE uId = ?";
             PreparedStatement updateReservationSeatStatement = conn.prepareStatement(updateReservationSeatSql);
             updateReservationSeatStatement.setInt(1, seatNumber);
@@ -176,6 +180,7 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
     // 이전 좌석 상태 업데이트
     private void updatePreviousSeatStatus(int row, int col) {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+        	// 좌석 테이블에서 좌석상태를 "예약 가능"으로 변경
             String updateSeatStatusSql = "UPDATE seats SET seatStatus = ? WHERE seatNumber = ?";
             PreparedStatement updateSeatStatusStatement = conn.prepareStatement(updateSeatStatusSql);
             updateSeatStatusStatement.setString(1, "예약 가능");
@@ -187,11 +192,10 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
         }
     }
 
-
-    
     // 좌석 상태 가져오기
     private void loadSeatStatus() {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+        	// 좌석 테이블에서 좌석번호와 좌석상태 가져오기
             String loadSeatsSql = "SELECT seatNumber, seatStatus FROM seats";
             Statement stmt = conn.createStatement();
             ResultSet seatsResult = stmt.executeQuery(loadSeatsSql);
@@ -203,10 +207,11 @@ public class SeatMovementFrame extends JFrame implements ActionListener {
 
                 String seatStatusStr = seatsResult.getString("seatStatus");
                 seatStatus[row][col] = seatStatusStr.equals("예약 가능");
-
-                String seatStatusText = seatStatus[row][col] ? Integer.toString(seatNumber) : "예약 불가능";
-                if(seatStatusText.equals("예약 불가능")) {
-                	seatButtons[row][col].setEnabled(false);
+                
+                // 예약 가능한 좌석은 좌석번호(숫자)로, 예약된 좌석은 "사용중"(문자)으로 표시
+                String seatStatusText = seatStatus[row][col] ? Integer.toString(seatNumber) : "사용중";
+                if(seatStatusText.equals("사용중")) {
+                	seatButtons[row][col].setEnabled(false); // 예약된 좌석은 비활성화
                 }
                 seatButtons[row][col].setText(seatStatusText);
             }

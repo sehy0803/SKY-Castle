@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import ksh.RoundedButton;
-
+// 좌석현황 프레임
 public class SeatStatusFrame extends JFrame implements ActionListener {
     private Font fontA = new Font("맑은 고딕", Font.BOLD, 20);
     private Font fontB = new Font("맑은 고딕", Font.PLAIN, 15);
@@ -26,6 +26,7 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
     
     private static String loggedInUserId; // 로그인한 사용자의 아이디
     
+    // JDBC 연결 정보
     private static final String URL = "jdbc:mysql://localhost/studycafe";
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
@@ -47,6 +48,7 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
         setVisible(true);
     }
     
+    // 라벨 설정
     private void setLabel() {
     	JLabel lblSeatStatus = new JLabel("좌석현황");
     	lblSeatStatus.setFont(fontD);
@@ -66,6 +68,7 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
     
     // 좌석 설정
     private void setSeatButtons() {
+    	// 좌석번호와 상태를 저장할 배열 생성
         seatButtons = new RoundedButton[5][5];
         seatStatus = new boolean[5][5];
 
@@ -83,7 +86,7 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
                 seatButtons[row][col] = seatButton;
             }
         }
-
+        
         panel.add(seatPanel);
         loadSeatStatus();
     }
@@ -116,7 +119,8 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
         setContentPane(panel);
         return panel;
     }
-
+    
+    // 액션 리스너
     @Override
     public void actionPerformed(ActionEvent e) {
     	Object obj = e.getSource();
@@ -129,6 +133,7 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
     // 좌석 상태 가져오기
     private void loadSeatStatus() {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+        	// 좌석 테이블에서 좌석번호와 좌석상태 가져오기
             String loadSeatsSql = "SELECT seatNumber, seatStatus FROM seats";
             Statement stmt = conn.createStatement();
             ResultSet seatsResult = stmt.executeQuery(loadSeatsSql);
@@ -140,8 +145,9 @@ public class SeatStatusFrame extends JFrame implements ActionListener {
 
                 String seatStatusStr = seatsResult.getString("seatStatus");
                 seatStatus[row][col] = seatStatusStr.equals("예약 가능");
-
-                String seatStatusText = seatStatus[row][col] ? Integer.toString(seatNumber) : "예약 불가능";
+                
+                // 예약 가능한 좌석은 좌석번호(숫자)로, 예약된 좌석은 "사용중"(문자)으로 표시
+                String seatStatusText = seatStatus[row][col] ? Integer.toString(seatNumber) : "사용중";
                 seatButtons[row][col].setText(seatStatusText);
             }
         } catch (SQLException ex) {

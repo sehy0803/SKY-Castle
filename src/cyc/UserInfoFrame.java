@@ -25,7 +25,7 @@ import ksh.LoginFrame;
 import ksh.MainFrame;
 import ksh.RoundedButton;
 import ksh.User;
-
+// 회원정보 프레임
 public class UserInfoFrame extends JFrame implements ActionListener, MouseListener {
 
 	private Font fontA = new Font("맑은 고딕", Font.BOLD, 18);
@@ -202,7 +202,7 @@ public class UserInfoFrame extends JFrame implements ActionListener, MouseListen
 		panel.add(btnUnRegister);
 	}
 
-	
+	// 액션 리스너
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == btnUnRegister) {
@@ -222,7 +222,7 @@ public class UserInfoFrame extends JFrame implements ActionListener, MouseListen
         String userId = loggedInUserId; // 로그인한 사용자의 아이디
         String password = ""; // 비밀번호
         String phone = ""; // 전화번호
-		
+
         try {
             // 데이터베이스 연결
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -313,7 +313,8 @@ public class UserInfoFrame extends JFrame implements ActionListener, MouseListen
 	        JOptionPane.showMessageDialog(this, "데이터베이스 오류", "오류", JOptionPane.ERROR_MESSAGE);
 	    }
 	}
-
+	
+	// 마우스 리스너
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		Object obj = e.getSource();
