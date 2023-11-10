@@ -1,4 +1,4 @@
-2023 자바 스윙 프로젝트<p></p>
+2023 자바 스윙 프로젝트<br>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/3ebb4952-b126-4b2b-9936-54bdb90f4bd7" width="180" height="240"/>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/3ebb4952-b126-4b2b-9936-54bdb90f4bd7" width="180" height="240"/>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/34752721-48f9-4587-8bff-e665d61a3070" width="180" height="240"/>
