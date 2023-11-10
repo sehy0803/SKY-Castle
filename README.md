@@ -13,3 +13,17 @@
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/20ad9892-6b7d-4535-bc47-d4a291f1fec8" width="180" height="240"/>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/5165004c-3733-41a2-ac06-2cfad3b6c9b7" width="180" height="240"/>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/bf16dc92-2fe0-4b2d-bb56-a3ebe1f7c869" width="180" height="240"/>
+
+![스크린샷 2023-11-10 104430](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/94c4cd65-7856-4637-a054-d7fc072e2ff9)
+![스크린샷 2023-11-10 104052](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/e3b920ee-4cf9-48f2-ad77-89e0bc680698)
+![스크린샷 2023-11-10 104111](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/4ac3b9bc-e9fb-49d4-802b-f00bbd0eb6be)
+![스크린샷 2023-11-10 104124](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/1d2c1fc3-5a65-468c-97b1-9e4a5bae3e2e)
+![스크린샷 2023-11-10 104145](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/a0a4d47e-87b6-4f44-b427-e2bc3ab59298)
+![스크린샷 2023-11-10 104157](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/c0b48107-9e1b-4c70-9a2e-d98ff2723869)
+![스크린샷 2023-11-10 104214](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/4f4fe2aa-67a4-484d-bd9f-a5a8a162de3c)
+![스크린샷 2023-11-10 104228](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/f7590e5b-06f7-4cd0-9ee0-b9955596c08d)
+![스크린샷 2023-11-10 104240](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/364a21d7-0b72-4452-99a6-e6a6c9ad3b3f)
+![스크린샷 2023-11-10 104253](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/03238219-cbbe-4bb4-92e3-20211a29a4a1)
+![스크린샷 2023-11-10 104323](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/97272ee4-745c-4430-9265-a28480ad59a2)
+![스크린샷 2023-11-10 104337](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/17d95ec2-9d35-4b8f-b372-56eef25b2915)
+![스크린샷 2023-11-10 104415](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/02090b13-c351-4b30-85aa-2ce510f55885)
