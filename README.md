@@ -1,8 +1,10 @@
 2023 자바 스윙 프로젝트
+600:800
+<img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/3ebb4952-b126-4b2b-9936-54bdb90f4bd7" width="300" height="400"/>
 
 ![image](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/3ebb4952-b126-4b2b-9936-54bdb90f4bd7)
-![image](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/291a4a71-9d14-4ffc-b443-b1036219f19c)
 ![image](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/34752721-48f9-4587-8bff-e665d61a3070)
+![image](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/291a4a71-9d14-4ffc-b443-b1036219f19c)
 ![image](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/30a99e5e-dd14-4709-98af-44afba9042f2)
 ![image](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/25726662-fd8d-4169-b615-02c836c8b974)
 ![image](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/d8e925e0-5920-4366-acd9-f25352a574f4)
