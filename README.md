@@ -14,6 +14,7 @@
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/5165004c-3733-41a2-ac06-2cfad3b6c9b7" width="180" height="240"/>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/bf16dc92-2fe0-4b2d-bb56-a3ebe1f7c869" width="180" height="240"/>
 
+<img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/94c4cd65-7856-4637-a054-d7fc072e2ff9" width="180" height="240"/>
 ![스크린샷 2023-11-10 104430](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/94c4cd65-7856-4637-a054-d7fc072e2ff9)
 ![스크린샷 2023-11-10 104052](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/e3b920ee-4cf9-48f2-ad77-89e0bc680698)
 ![스크린샷 2023-11-10 104111](https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/4ac3b9bc-e9fb-49d4-802b-f00bbd0eb6be)
