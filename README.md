@@ -1,4 +1,4 @@
-2023 자바 스윙 프로젝트<br>
+2023 자바 스윙 프로젝트 - 스터디카페 좌석 관리 시스템<br>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/94c4cd65-7856-4637-a054-d7fc072e2ff9" width="180" height="240"/>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/94c4cd65-7856-4637-a054-d7fc072e2ff9" width="180" height="240"/>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/e3b920ee-4cf9-48f2-ad77-89e0bc680698" width="180" height="240"/>
