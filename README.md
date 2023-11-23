@@ -1,4 +1,13 @@
-2023 자바 스윙 프로젝트 - 스터디카페 좌석 관리 시스템<br>
+<h1>스카이캐슬 - 스터디카페 좌석 관리 시스템</h1>
+<div>
+  <ul>
+    <li>개발 기간 : 2023. ~ 2023.</li>
+    <li>인력 구성 : 2명</li>
+    <li>프로젝트 목적 : 스터디카페 이용자들이 쉽고 간단하게 좌석을 이용할 수 있는 시스템 개발</li>
+    <li>주요 업무 및 역할 : 프로젝트 기획, 설계, 디자인, DB 구성</li>
+    <li>설명 : 이 프로젝트는 팀원과의 멘토링을 통해 Java를 학습하고 지식을 공유하며 진행되었습니다.</li>
+  </ul>
+</div>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/94c4cd65-7856-4637-a054-d7fc072e2ff9" width="180" height="240"/>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/94c4cd65-7856-4637-a054-d7fc072e2ff9" width="180" height="240"/>
 <img src="https://github.com/sehy0803/2023JavaSwingProject/assets/80893236/e3b920ee-4cf9-48f2-ad77-89e0bc680698" width="180" height="240"/>
