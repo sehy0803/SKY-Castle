@@ -1,4 +1,4 @@
-#SKY-Castle
+# SKY-Castle
 <h1>스카이캐슬 - 스터디카페 좌석 관리 시스템</h1>
 <div>
   <ul>
